@@ -16,3 +16,7 @@ Image feature keypoint matching
       - expert confirmation meanshift is the "correct" approach: <https://answers.opencv.org/question/17985/detecting-multiple-instances-of-same-object-with-keypoint-matching-approach/>
 - TBH if ppl were still researching keypoint detection, there might be damn good methods by now methods that can match neural networks with much less data (like a better version of HAAR) but no it got abandoned in favour of neural networks
 - NOTE: Usage of ORB Detector & BEBLID Descriptor is hardcoded, trying to make it configurable is difficult due to different parameters involved...
+- NOTE: GPU Acceleration doesn't seem feasible
+  - Either openCV's openCL-based transparent API doesn't cover the functions we are using, or the overhead of GPU transfer dominates CPU usage
+  - CUDA requires significant messing up of everything to work, and likely will also have the overhead issue
+  

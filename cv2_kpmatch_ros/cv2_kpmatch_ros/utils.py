@@ -1,8 +1,10 @@
 import cv2
 
 
-def calc_features(img, detector, descriptor=None, mask=None, keypoints=None):
-    """Calculate (keypoints, descriptors, height, width) given an image.
+def calc_features(
+    img, detector, descriptor=None, mask=None, keypoints=None, use_cuda=False
+):
+    """Calculate (keypoints, descriptors) given an image.
 
     Args:
         detector (Any): Keypoint detector to use.
@@ -10,12 +12,16 @@ def calc_features(img, detector, descriptor=None, mask=None, keypoints=None):
         mask (np.ndarray): bitmask where 1 indicates region of interests.
         keypoints (_type_, optional): Manually specified keypoints to use. Defaults to None.
     """
-    assert len(img.shape) == 2, "Image must be grayscale!"
-    kps = keypoints if keypoints else detector.detect(img, mask)
-    kps, desc = (
-        descriptor.compute(img, kps) if descriptor else detector.compute(img, kps)
-    )
-    return kps, desc, img.shape[0], img.shape[1]
+    # assert len(img.shape) == 2, "Image must be grayscale!"
+    if use_cuda:
+        # ignore descriptor... theres only 1 good CUDA keypoint detector: ORB
+        kps, desc = detector.detectAndComputeAsync(img, mask)
+    else:
+        kps = keypoints if keypoints else detector.detect(img, mask)
+        kps, desc = (
+            descriptor.compute(img, kps) if descriptor else detector.compute(img, kps)
+        )
+    return kps, desc
 
 
 # best explanation of homography method I could find:
