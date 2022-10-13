@@ -275,6 +275,7 @@ class KpDetector(Job[kpDetCfg]):
                 rect = ImageMarker(header=msg.header)
                 rect.scale = 4.0
                 rect.type = ImageMarker.POLYGON
+                rect.ns = name
                 rect.outline_color.r = float(color[0])
                 rect.outline_color.g = float(color[1])
                 rect.outline_color.b = float(color[2])
