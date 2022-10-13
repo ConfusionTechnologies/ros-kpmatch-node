@@ -74,6 +74,8 @@ class kpDetCfg(JobCfg):
     Under stress test conditions (>1m features, no bg removal, 16 levels), had performance penalty, so likely useless."""
     scale_wh: Union[int, tuple[int, int]] = 480
     """scale props to fit this resolution"""
+    normalize_coords: bool = False
+    """Whether to normalize coords."""
     ratio_thres: float = 0.8
     """threshold for keypoint to be considered a match"""
     homography_method: int = cv2.RANSAC

@@ -85,6 +85,7 @@ class KpDetector(Job[kpDetCfg]):
                 "inlier_thres",
                 "use_bg_subtraction",
                 "use_ocl",
+                "normalize_coords",
                 "debug",
             )
             for n in changes
@@ -199,9 +200,6 @@ class KpDetector(Job[kpDetCfg]):
         if not self.cfg.use_cuda and len(t_kp) == 0:
             return o
 
-        # standardize box coords
-        wh = shape[::-1]
-
         matched_kp = []
         for name, (q_kp, q_desc, qh, qw) in self.features.items():
             matcher = self.flann_matcher if self.cfg.use_flann else self.matcher
@@ -229,7 +227,8 @@ class KpDetector(Job[kpDetCfg]):
             ).reshape(-1, 1, 2)
             try:
                 box = cv2.perspectiveTransform(box, transform).reshape(-1, 2)
-                # box /= wh
+                if self.cfg.normalize_coords:
+                    box /= shape[::-1]
                 results.append((name, box))
                 if self.cfg.debug:
                     matched_kp.append(
@@ -237,8 +236,7 @@ class KpDetector(Job[kpDetCfg]):
                             name,
                             np.array(
                                 tuple(t_kp[m.trainIdx].pt for m in matches)
-                            ).reshape(-1, 2)
-                            # / wh,
+                            ).reshape(-1, 2),
                         )
                     )
 
@@ -246,7 +244,7 @@ class KpDetector(Job[kpDetCfg]):
                 pass
         if self.cfg.debug:
             o["debug"] = {
-                "all_kp": cv2.KeyPoint_convert(t_kp),  # / wh,
+                "all_kp": cv2.KeyPoint_convert(t_kp),
                 "matched_kp": matched_kp,
             }
         return o
