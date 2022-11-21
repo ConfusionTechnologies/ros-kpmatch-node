@@ -203,14 +203,19 @@ class KpDetector(Job[kpDetCfg]):
         matched_kp = []
         for name, (q_kp, q_desc, qh, qw) in self.features.items():
             matcher = self.flann_matcher if self.cfg.use_flann else self.matcher
+            pairs = []
             if self.cfg.use_cuda:
                 pairs = matcher.knnMatchAsync(
                     q_desc, t_desc, k=2
                 )  # pairs of (best, 2nd best) matches
             else:
-                pairs = matcher.knnMatch(
-                    q_desc, t_desc, k=2
-                )  # pairs of (best, 2nd best) matches
+                try:
+                    pairs = matcher.knnMatch(
+                        q_desc, t_desc, k=2
+                    )  # pairs of (best, 2nd best) matches
+                except Exception as e:
+                    # flannMatcher tends to throw errors for no reason
+                    self.log.warning(str(e))
             matches = filter_matches(pairs, ratio_thres=self.cfg.ratio_thres)
             if len(matches) < self.cfg.min_matches:
                 continue
