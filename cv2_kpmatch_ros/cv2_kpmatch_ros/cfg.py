@@ -25,9 +25,10 @@ class orbCfg:
 
 @dataclass
 class queryDetCfg(orbCfg):
-    nfeatures: int = 1000
-    scaleFactor: float = 1.2
-    nlevels: int = 4
+    # setting this high is fine; ORB won't hit the max if doesn't need to
+    nfeatures: int = 2000
+    scaleFactor: float = 1.1
+    nlevels: int = 12
     edgeThreshold: int = 31
     firstLevel: int = 0
     WTA_K: int = 2
@@ -42,7 +43,7 @@ class testDetCfg(orbCfg):
     expecting the query detector to have detected features at several scales beforehand.
     """
 
-    nfeatures: int = 1000
+    nfeatures: int = 20000
     scaleFactor: float = 1.0
     nlevels: int = 1
     edgeThreshold: int = 31
@@ -72,7 +73,7 @@ class kpDetCfg(JobCfg):
     use_ocl: bool = False
     """use openCV transparent openCL API for possible performance boost.
     Under stress test conditions (>1m features, no bg removal, 16 levels), had performance penalty, so likely useless."""
-    scale_wh: Union[int, tuple[int, int]] = 480
+    scale_wh: Union[int, tuple[int, int]] = 640
     """scale props to fit this resolution"""
     normalize_coords: bool = False
     """Whether to normalize coords."""
